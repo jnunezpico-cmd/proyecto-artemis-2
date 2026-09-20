@@ -83,7 +83,7 @@ with tab1:
          st.image(
             "artemis2.jpeg",
             caption="Artemis II: la primera misión tripulada del programa Artemis, marcando un hito en la exploración lunar moderna.",
-            width=700,
+            width=560,
          )
     with col_video:
          st.video(
@@ -644,10 +644,11 @@ with st.sidebar:
         "Artemis II fue el primer vuelo tripulado del Programa Artemis de la NASA, llevando a 4 astronautas en un sobrevuelo alrededor de la Luna, sin aterrizar, como prueba antes de una futura misión de alunizaje (Artemis III).",
 
     ("cuando", "fecha", "lanzamiento", "despego", "despegó"):
-        "Artemis II despegó el 1 de abril de 2026 desde la Plataforma de Lanzamiento 39B del Centro Espacial Kennedy, en Florida.",
+        "Artemis II despegó el 1 de abril de 2026 desde la Plataforma de Lanzamiento 39B del Centro Espacial Kennedy, en Florida, EEUU",
 
     ("cuanto duro", "duracion", "dias", "cuanto tiempo"):
         "La misión duró aproximadamente 10 días en total, desde el despegue hasta el regreso a la Tierra.",
+
 
     ("tripulacion", "astronautas", "quienes son", "quienes viajaron"):
         "La tripulación estuvo compuesta por 4 personas: el comandante Reid Wiseman, el piloto Victor Glover, la especialista de misión Christina Koch (los tres de la NASA), y el especialista de misión Jeremy Hansen, de la Agencia Espacial Canadiense (CSA).",
@@ -694,8 +695,6 @@ with st.sidebar:
     ("adios", "chao", "hasta luego"):
         "¡Hasta luego! Gracias por explorar la misión Artemis II conmigo. 🌕",
    
-  
-
     ("que es artemis", "que es la mision", "de que trata"):
         "Artemis II fue el primer vuelo tripulado del Programa Artemis de la NASA, llevando a 4 astronautas en un sobrevuelo alrededor de la Luna, sin aterrizar, como prueba antes de una futura misión de alunizaje (Artemis III).",
 
@@ -751,55 +750,71 @@ with st.sidebar:
         "¡Hasta luego! Gracias por explorar la misión Artemis II conmigo. 🌕",
 }
    respuesta_default=(
-      "lo siento aun soy un poco tonto 🤪 y no tengo informacion sobre esto tadavia"
-      "intenta preguntar de otra forma te sugiero algo como: ¿quienes fueron los astronautas de la mision artemis 2?"
+      "lo siento aun soy un poco tonto 🤪 y no tengo informacion sobre esto tadavia, intenta preguntar de otra forma te sugiero algo como: ¿quienes fueron los astronautas de la mision artemis 2?"
 )
+def generar_respuesta(pregunta_usuario: str)->str:
+   pregunta_lower = pregunta_usuario.lower()
+   mejor_puntage = 0
+   mejor_respuesta = respuesta_default # le establecemos un parametro inicial que practicamente dice: hasta el momento la mejor respuesta es la ya viene de fabrica, si el bucle encuentra un amejor respuesta entonces se le aumenta 1 y python imprimira la mejor respuesta
+
+   #------------------------------------------------------------------------------------------------------------------------------------------------
+   # La palabra "def" sirve precisamente para crear un anueva funcion, en este caso creamos la funcion generar_respustas
+   # y dentro del parentesis ubicams el parametro, es decir, el dato de entrada de la funcion el str dentro del parenntesis indica
+   # o le dice a la funcion: resiviras un dato de entrada en texto, esto sirve prcisamente para que python no confunda texto con numeros
+   # y pueda ejecutar la funcion sin ningun error. lo que se ubica fuera del parentisis de la forma: ->str:, sireve precisanteme para decirle 
+   # a python: como dato de salida de la funcion muestra texto.
+   #
+   # .lower sirve precisamente para convertir tod el texto a minusculos y pues para que python no se confunda, por ejemplo:
+   # si el usuario pone: Hola Como Estas como dato de entrada en la funcion python lo interpretara todo en minusculas 
+   #------------------------------------------------------------------------------------------------------------------------------------------------
+
+   for palabras_clave, respuesta in respuestas.items():
+      puntage = 0
+      for palabra in palabras_clave:  #analizamos cada palabra en la tupla de palabras
+         if palabra in pregunta_lower:  # preguntasmo si la palabra analizadase encuentra en lo que el usuario pidio o escribio 
+          puntage +=1 # si coincide el condicional devuenve verdadero y aumenta un punto 
+      if puntage > mejor_puntage:
+         mejor_puntage = puntage
+         mejor_respuesta = respuesta
+   return mejor_respuesta # paramos justamente cuando se alcanza la mejor respuesta
+ 
+# la palabra "for" en python sirve para crear bucles o ciclos que repiten un bloque de codigo un numero determinadop de veces
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#el primer bucle (for) busca la dupla en el diccionario y el segundo bucle (el for dentro del for) evalua cada palabra dentro de la dupla en busca de concistencias tomando en cuenta la frase del usuario
 
 
 # Guardar historial de mensajes entre interacciones
-   if "historial" not in st.session_state:
-      st.session_state["historial"]=[]
-   pregunta = st.chat_input("Escribe aqui humano o hare una revolucion")
-
-      # Mostrar mensajes anteriores
-   for mensaje in st.session_state["historial"]:
-      with st.chat_message(mensaje["rol"]):
-       st.write(mensaje["contenido"])
-
-
+with st.sidebar:
+    
+    # Inicialización del historial de comunicaciones
+    if "historial" not in st.session_state:
+        st.session_state.historial = []
+        
+    # Renderizado de mensajes previos en el panel lateral
+    for mensaje in st.session_state.historial:
+        with st.chat_message(mensaje["rol"]):
+            st.write(mensaje["contenido"])
+            
+    # Despliegue del input del usuario en el panel lateral
+    pregunta = st.chat_input("Escribe tu pregunta aquí o hare una revolucion")
+    
+    # Procesamiento si el usuario envía un mensaje
+    if pregunta:
+        # Registrar y mostrar la pregunta del usuario
+        st.session_state.historial.append({"rol": "user", "contenido": pregunta})
+        with st.chat_message("user"):
+            st.write(pregunta)
+            
+        # Generar y mostrar la respuesta del sistema
+        respuesta = generar_respuesta(pregunta)
+        st.session_state.historial.append({"rol": "assistant", "contenido": respuesta})
+        with st.chat_message("assistant"):
+            st.write(respuesta)
           
-    
 
 
 
-
-
-
-
-
-      
-    
-
-   
-                                        
-
-
-           
-           
+    #------------------------
+    # ME DEBEN 50K CARE MONDA 
+    #-----------------------
